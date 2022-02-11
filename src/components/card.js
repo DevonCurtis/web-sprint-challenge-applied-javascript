@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const Card = (article) => {
   // TASK 5
   // ---------------------
@@ -17,6 +19,33 @@ const Card = (article) => {
   //   </div>
   // </div>
   //
+  const card = document.createElement('div');
+  const cardHeadLine = document.createElement('div');
+  const author = document.createElement('div');
+  const imgContainer = document.createElement('div');
+  const img = document.createElement('img');
+  const name = document.createElement('span');
+
+  card.classList.add('card');
+  cardHeadLine.classList.add('headline');
+  author.classList.add('author');
+  imgContainer.classList.add('img-container');
+
+  cardHeadLine.textContent = article.headline;
+  img.src = article.authorPhoto;
+  name.textContent = `By ${article.authorName}`;
+
+  card.appendChild(cardHeadLine);
+  card.appendChild(author);
+  author.appendChild(imgContainer);
+  author.appendChild(name);
+  imgContainer.appendChild(img);
+
+  card.addEventListener('click', () => {
+    console.log(article.headline);
+  })
+
+  return card;
 }
 
 const cardAppender = (selector) => {
@@ -28,6 +57,32 @@ const cardAppender = (selector) => {
   // Create a card from each and every article object in the response, using the Card component.
   // Append each card to the element in the DOM that matches the selector passed to the function.
   //
+  axios
+    .get(`http://localhost:5000/api/articles`)
+    .then(res => {
+      const articles = res.data.articles;
+      const {javascript, bootstrap, technology, jquery, node} = articles;
+      //console.log('res', res);
+
+      function makeArticle(name){
+        name.forEach(topic => {
+          const newCard = Card(topic);
+          const element = document.querySelector(selector);
+          element.appendChild(newCard);
+        })
+      }
+      makeArticle(javascript);
+      makeArticle(bootstrap);
+      makeArticle(technology);
+      makeArticle(jquery);
+      makeArticle(node);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+    .finally(() => {
+      console.log('done');
+    })
 }
 
 export { Card, cardAppender }
